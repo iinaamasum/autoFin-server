@@ -3,6 +3,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require('cors');
+var jwt = require('jsonwebtoken');
 
 //middleware
 app.use(cors());
@@ -22,10 +23,46 @@ async function run() {
 
   //collections
   const toolsCollection = client.db('autoFin').collection('tools');
+  const usersSelectedCollection = client.db('autoFin').collection('usersData');
   const reviewCollection = client.db('autoFin').collection('review');
   const usersCollection = client.db('autoFin').collection('userData');
 
   try {
+    /**
+     * JWT token post api
+     * link-local: http://localhost:5000/login
+     */
+    app.post('/login', async (req, res) => {
+      const loggedUser = req.body;
+      const token = jwt.sign(loggedUser, process.env.ACCESS_TOKEN_KEY, {
+        expiresIn: '10h',
+      });
+
+      res.send({ token });
+    });
+
+    /**
+     * verifyToken function section
+     */
+    const verifyToken = (req, res, next) => {
+      const author = req.headers.author;
+      if (!author) {
+        return res
+          .status(401)
+          .send({ name: 'NoToken', message: 'Unauthorized Access' });
+      }
+      const token = author.split(' ')[1];
+      jwt.verify(token, process.env.ACCESS_TOKEN_KEY, (error, decoded) => {
+        if (error) {
+          return res
+            .status(403)
+            .send({ name: 'WrongToken', message: 'Forbidden Access' });
+        }
+        req.decoded = decoded;
+        next();
+      });
+    };
+
     /**
      * get all products
      * link: http://localhost:5000/products
@@ -42,7 +79,25 @@ async function run() {
      */
     app.post('/product', async (req, res) => {
       const product = req.body;
-      const result = await toolsCollection.insertOne(product);
+      const result = await usersSelectedCollection.insertOne(product);
+      res.send(result);
+    });
+    /**
+     * update product
+     * link: http://localhost:5000/product/${_id}
+     */
+    app.put('/product/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedData = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+
+      const newData = {
+        $set: updatedData,
+      };
+
+      const result = await toolsCollection.updateOne(filter, newData, options);
+
       res.send(result);
     });
 
@@ -61,10 +116,17 @@ async function run() {
      * user dashboard items
      * link: http://localhost:5000/myOrders/email
      */
-    app.get('/myOrders', async (req, res) => {
-      const query = { email: req.query.email };
-      const myOrders = await toolsCollection.find(query).toArray();
-      res.send(myOrders);
+    app.get('/myOrders', verifyToken, async (req, res) => {
+      const decodedEmail = req.decoded.email;
+      if (req.query.email === decodedEmail) {
+        const query = { email: req.query.email };
+        const myOrders = await usersSelectedCollection.find(query).toArray();
+        res.send(myOrders);
+      } else {
+        res
+          .status(403)
+          .send({ name: 'WrongToken', message: 'Forbidden Access' });
+      }
     });
 
     /**------------------------------------------------------------- */
@@ -93,9 +155,9 @@ async function run() {
      * user info get
      * link: http://localhost:5000/user
      */
-    app.get('/user', async (req, res) => {
-      const query = { email: req.query.email };
-      const result = await usersCollection.findOne(query).toArray();
+    app.get('/user/:email', async (req, res) => {
+      const query = { email: req.params.email };
+      const result = await usersCollection.findOne(query);
       res.send(result);
     });
 
