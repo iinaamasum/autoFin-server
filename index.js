@@ -62,7 +62,6 @@ async function run() {
      */
     app.get('/myOrders', async (req, res) => {
       const query = { email: req.query.email };
-
       const myOrders = await toolsCollection.find(query).toArray();
       res.send(myOrders);
     });
@@ -74,7 +73,17 @@ async function run() {
      */
     app.get('/review', async (req, res) => {
       const query = {};
-      const result = await reviewCollection.find(query);
+      const result = await reviewCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    /**
+     * post a review
+     * link: http://localhost:5000/review
+     */
+    app.post('/review', async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
       res.send(result);
     });
   } finally {
