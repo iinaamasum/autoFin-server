@@ -22,6 +22,7 @@ async function run() {
 
   //collections
   const toolsCollection = client.db('autoFin').collection('tools');
+  const reviewCollection = client.db('autoFin').collection('review');
 
   try {
     /**
@@ -50,7 +51,6 @@ async function run() {
      */
     app.get('/product/:id', async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const query = { _id: ObjectId(id) };
       const result = await toolsCollection.findOne(query);
       res.send(result);
@@ -62,9 +62,20 @@ async function run() {
      */
     app.get('/myOrders', async (req, res) => {
       const query = { email: req.query.email };
-      console.log(query);
+
       const myOrders = await toolsCollection.find(query).toArray();
       res.send(myOrders);
+    });
+
+    /**------------------------------------------------------------- */
+    /**
+     * get all review
+     * link: http://localhost:5000/review
+     */
+    app.get('/review', async (req, res) => {
+      const query = {};
+      const result = await reviewCollection.find(query);
+      res.send(result);
     });
   } finally {
   }
