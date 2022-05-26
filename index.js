@@ -90,12 +90,31 @@ async function run() {
 
     /**--------------------------------------------------------------- */
     /**
-     * user info
+     * user info get
      * link: http://localhost:5000/user
      */
     app.get('/user', async (req, res) => {
       const query = { email: req.query.email };
       const result = await usersCollection.findOne(query).toArray();
+      res.send(result);
+    });
+
+    /**
+     * user info upsert
+     * link: http://localhost:5000/user/${email}
+     */
+    app.put('/user/:email', async (req, res) => {
+      const email = req.params.email;
+      const updatedData = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+
+      const newData = {
+        $set: updatedData,
+      };
+
+      const result = await usersCollection.updateOne(filter, newData, options);
+
       res.send(result);
     });
   } finally {
