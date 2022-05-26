@@ -19,6 +19,22 @@ const client = new MongoClient(uri, {
 async function run() {
   await client.connect();
   console.log('db connected');
+
+  //collections
+  const toolsCollection = client.db('autoFin').collection('tools');
+
+  try {
+    /**
+     * get all products
+     * link: http://localhost:5000/products
+     */
+    app.get('/products', async (req, res) => {
+      const query = {};
+      const result = await toolsCollection.find(query).toArray();
+      res.send(result);
+    });
+  } finally {
+  }
 }
 
 run().catch(console.dir);
