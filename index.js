@@ -23,6 +23,7 @@ async function run() {
   //collections
   const toolsCollection = client.db('autoFin').collection('tools');
   const reviewCollection = client.db('autoFin').collection('review');
+  const usersCollection = client.db('autoFin').collection('userData');
 
   try {
     /**
@@ -84,6 +85,17 @@ async function run() {
     app.post('/review', async (req, res) => {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
+    /**--------------------------------------------------------------- */
+    /**
+     * user info
+     * link: http://localhost:5000/user
+     */
+    app.get('/user', async (req, res) => {
+      const query = { email: req.query.email };
+      const result = await usersCollection.findOne(query).toArray();
       res.send(result);
     });
   } finally {
