@@ -211,6 +211,25 @@ async function run() {
 
       res.send(result);
     });
+
+    /**
+     * make admin api
+     * link: http://localhost:5000/user/${email}
+     */
+    app.put('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedData = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+
+      const newData = {
+        $set: updatedData,
+      };
+
+      const result = await usersCollection.updateOne(filter, newData, options);
+
+      res.send(result);
+    });
   } finally {
   }
 }
