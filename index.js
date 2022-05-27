@@ -10,6 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { query } = require('express');
 const uri = `mongodb+srv://${process.env.DB_USR}:${process.env.DB_PASS}@cluster0.gcblq.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -179,6 +180,16 @@ async function run() {
     app.get('/user/:email', async (req, res) => {
       const query = { email: req.params.email };
       const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
+
+    /**
+     * get all user info
+     * link: http://localhost:5000/user
+     */
+    app.get('/user', async (req, res) => {
+      const query = {};
+      const result = await usersCollection.find(query).toArray();
       res.send(result);
     });
 
