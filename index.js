@@ -77,6 +77,27 @@ async function run() {
      * post product
      * link: http://localhost:5000/product
      */
+    app.post('/tools', async (req, res) => {
+      const product = req.body;
+      const result = await toolsCollection.insertOne(product);
+      res.send(result);
+    });
+
+    /**
+     * delete product
+     * link: http://localhost:5000/product/id
+     */
+    app.delete('/product/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await toolsCollection.deleteOne(filter);
+      res.send(result);
+    });
+
+    /**
+     * post product
+     * link: http://localhost:5000/product
+     */
     app.post('/product', async (req, res) => {
       const product = req.body;
       const result = await usersSelectedCollection.insertOne(product);
