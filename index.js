@@ -216,10 +216,11 @@ async function run() {
      * make admin api
      * link: http://localhost:5000/user/${email}
      */
-    app.put('/user/:id', async (req, res) => {
-      const id = req.params.id;
+    app.put('/userAdmin/:email', async (req, res) => {
+      const email = req.params.email;
       const updatedData = req.body;
-      const filter = { _id: ObjectId(id) };
+      console.log(updatedData, email);
+      const filter = { email: email };
       const options = { upsert: true };
 
       const newData = {
