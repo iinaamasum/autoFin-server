@@ -139,7 +139,7 @@ async function run() {
      * delete single product
      * link: http://localhost:5000/product/:id
      */
-    app.delete('/product/:id', async (req, res) => {
+    app.delete('/userData/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await usersSelectedCollection.deleteOne(query);
