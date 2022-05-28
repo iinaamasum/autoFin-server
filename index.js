@@ -4,6 +4,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const cors = require('cors');
 var jwt = require('jsonwebtoken');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 //middleware
 app.use(cors());
@@ -170,6 +171,45 @@ async function run() {
           .status(403)
           .send({ name: 'WrongToken', message: 'Forbidden Access' });
       }
+    });
+
+    /**
+     * user dashboard item update
+     * link: http://localhost:5000/myOrders/email
+     */
+    app.put('/usersOrder/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedData = req.body;
+      const filter = { _id: ObjectId(id) };
+      const options = { upsert: true };
+
+      const newData = {
+        $set: updatedData,
+      };
+
+      const result = await usersSelectedCollection.updateOne(
+        filter,
+        newData,
+        options
+      );
+
+      res.send(result);
+    });
+
+    /**
+     * user dashboard items
+     * link: http://localhost:5000/payment
+     */
+
+    app.post('/payment', async (req, res) => {
+      const { price } = req.body;
+      const amount = price * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ['card'],
+      });
+      res.send({ clientSecret: paymentIntent.client_secret });
     });
 
     /**------------------------------------------------------------- */
