@@ -171,17 +171,10 @@ async function run() {
      * user dashboard items
      * link: http://localhost:5000/myOrders/email
      */
-    app.get('/myOrders', verifyToken, async (req, res) => {
-      const decodedEmail = req.decoded.email;
-      if (req.query.email === decodedEmail) {
-        const query = { email: req.query.email };
-        const myOrders = await usersSelectedCollection.find(query).toArray();
-        res.send(myOrders);
-      } else {
-        res
-          .status(403)
-          .send({ name: 'WrongToken', message: 'Forbidden Access' });
-      }
+    app.get('/myOrders', async (req, res) => {
+      const query = { email: req.query.email };
+      const myOrders = await usersSelectedCollection.find(query).toArray();
+      res.send(myOrders);
     });
 
     /**
