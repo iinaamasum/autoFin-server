@@ -135,6 +135,27 @@ async function run() {
     });
 
     /**
+     * get all users selected items
+     * link: http://localhost:5000/usersOrder
+     */
+    app.get('/usersOrder', async (req, res) => {
+      const query = {};
+      const result = await usersSelectedCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    /**
+     * get user selected data via id
+     * link: http://localhost:5000/usersOrder/${id}
+     */
+    app.get('/usersOrder/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await usersSelectedCollection.findOne(query);
+      res.send(result);
+    });
+
+    /**
      * user dashboard items
      * link: http://localhost:5000/myOrders/email
      */
@@ -219,7 +240,7 @@ async function run() {
     app.put('/userAdmin/:email', async (req, res) => {
       const email = req.params.email;
       const updatedData = req.body;
-      console.log(updatedData, email);
+      // console.log(updatedData, email);
       const filter = { email: email };
       const options = { upsert: true };
 
