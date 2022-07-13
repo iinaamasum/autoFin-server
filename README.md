@@ -1,7 +1,7 @@
 # autoFin - a car product manufacturer site
 
 Live Site [Click Here](https://autofin-32068.web.app/).\
-Client Site Link [Click Here](https://github.com/iinaamasum/autoFin-server)
+Client Site Link [Click Here](https://github.com/iinaamasum/autoFin-client)
 
 ## About the Project
 
