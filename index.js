@@ -54,6 +54,7 @@ async function run() {
           .send({ name: 'NoToken', message: 'Unauthorized Access' });
       }
       const token = author.split(' ')[1];
+      //console.log(token);
       jwt.verify(token, process.env.ACCESS_TOKEN_KEY, (error, decoded) => {
         if (error) {
           return res
@@ -171,7 +172,7 @@ async function run() {
      * user dashboard items
      * link: http://localhost:5000/myOrders/email
      */
-    app.get('/myOrders', async (req, res) => {
+    app.get('/myOrders', verifyToken, async (req, res) => {
       const query = { email: req.query.email };
       const myOrders = await usersSelectedCollection.find(query).toArray();
       res.send(myOrders);
